@@ -1,5 +1,5 @@
 import { google } from '@ai-sdk/google';
-import { streamText } from 'ai';
+import { Output, generateText, streamText } from 'ai';
 import z from 'zod';
 
 const model = google('gemini-2.5-flash');
@@ -24,7 +24,19 @@ const finalText = await stream.text;
 //   the schema: z.object({
 //     facts: z.array(z.string()).describe('The facts about the imaginary planet. Write as if you are a scientist.'),
 //   })
-const factsResult = TODO;
+const factsResult = await generateText({
+  model,
+  prompt: `Give me facts about an imaginary planet ${finalText}`,
+  output: Output.object({
+    schema: z.object({
+      facts: z
+        .array(z.string())
+        .describe(
+          'The facts about the imaginary planet. Write as if you are a scientist.',
+        ),
+    }),
+  }),
+});
 
 // TODO: Log the output of the result
 console.log(factsResult.output);
