@@ -2,6 +2,8 @@ import { useChat } from '@ai-sdk/react';
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ChatInput, Message, Wrapper } from './components.tsx';
+import type { UIDataTypes, UIMessagePart, UITools } from 'ai';
+
 import './tailwind.css';
 
 const App = () => {
@@ -35,21 +37,22 @@ const App = () => {
             e.target as HTMLFormElement,
           );
           const file = formData.get('file') as File | null;
-
-          // TODO: figure out how to pass the file
-          // _as well as the text_ to the
-          // /api/chat route!
-
-          // NOTE: You have a helpful function below
-          // called fileToDataURL that you can use to
-          // convert the file to a data URL. This
-          // will be useful!
-
           // NOTE: Make sure you handle the case where
           // `file` is null!
+          const parts: UIMessagePart<UIDataTypes, UITools>[] = [
+            { type: 'text', text: input },
+          ];
+
+          if (file) {
+            parts.push({
+              type: 'file',
+              url: await fileToDataURL(file),
+              mediaType: file.type,
+            });
+          }
+
           sendMessage({
-            // NOTE: 'parts' will be useful
-            text: input,
+            parts,
           });
 
           setInput('');
